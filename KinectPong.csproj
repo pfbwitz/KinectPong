@@ -74,12 +74,14 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="bigicon.ico" />
+    <Content Include="images\bigicon.ico" />
+    <Content Include="images\icon.ico" />
     <None Include="app.config" />
-    <None Include="images\universe-background-1.jpg" />
     <None Include="images\BallWithAlpha.png" />
     <None Include="images\paddle.png" />
   </ItemGroup>

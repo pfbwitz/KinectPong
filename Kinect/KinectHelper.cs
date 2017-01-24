@@ -78,6 +78,9 @@ namespace KinectPong.Kinect
                     OnPositionDetermined(new PaddlePositionEventArgs(1, leftPos.Key, leftPos.Value / _depthFrameDescription.Height * 100));
                 }
 
+                if (!Program.IsTwoPlayerMode)
+                    return;
+
                 var right = _whitePixels.Where(p => p.Key > _depthFrameDescription.Width / 2).OrderByDescending(p => p.Key);
                 if (right.Any())
                 {

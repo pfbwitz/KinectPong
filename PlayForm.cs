@@ -37,7 +37,10 @@ namespace KinectPong
 
         private void KinectHelper_PositionDetermined(object sender, PaddlePositionEventArgs e)
         {
-            throw new NotImplementedException();
+            if (e.PlayerNumber == 1)
+                MovePlayer(e.YPercentage * Height / 100);
+            else
+                MoveCpu(e.YPercentage * Height / 100);
         }
 
         private void MovePaddles(object sender, EventArgs e)
@@ -89,8 +92,7 @@ namespace KinectPong
                 while (ball.Location.Y - 1 < _topBounds)
                     ball.Location = new Point(ball.Location.X, ball.Location.Y + 1);
             }
-
-            if (ball.Location.Y + ball.Height > _bottomBounds)   //Ball Control:  Bottom Wall
+            else if (ball.Location.Y + ball.Height > _bottomBounds)   //Ball Control:  Bottom Wall
             {
                 _ySpeed *= -1;
                 while (ball.Location.Y + 1 + ball.Height > _bottomBounds)
@@ -116,7 +118,12 @@ namespace KinectPong
 
         private void MovePlayer()
         {
-            paddle.Location = new Point(paddle.Location.X, (MousePosition.Y - paddle.Height));
+            MovePlayer(MousePosition.Y);
+        }
+
+        private void MovePlayer(int y)
+        {
+            paddle.Location = new Point(paddle.Location.X, (y - paddle.Height));
             if (paddle.Location.Y + paddle.Height > Height)
                 paddle.Location = new Point(paddle.Location.X, Height - paddle.Height);
             if (paddle.Location.Y < 0)
@@ -125,10 +132,21 @@ namespace KinectPong
 
         private void MoveCpu()
         {
+            if (Program.IsTwoPlayerMode)
+                return;
             if (ball.Location.Y > paddle2.Location.Y)
                 paddle2.Location = new Point(paddle2.Location.X, paddle2.Location.Y + _paddle2Speed);
             else
                 paddle2.Location = new Point(paddle2.Location.X, paddle2.Location.Y - _paddle2Speed);
+        }
+
+        private void MoveCpu(int y)
+        {
+            paddle2.Location = new Point(paddle2.Location.X, (y - paddle2.Height));
+            if (paddle2.Location.Y + paddle2.Height > Height)
+                paddle2.Location = new Point(paddle2.Location.X, Height - paddle2.Height);
+            if (paddle2.Location.Y < 0)
+                paddle2.Location = new Point(paddle2.Location.X, 0);
         }
 
         private void SetDimensions()
@@ -192,6 +210,9 @@ namespace KinectPong
 
         private void ShrinkPaddle(PictureBox p)
         {
+            if (p.Height == _paddleBaseHeight / 4)
+                return;
+
             p.Height = Convert.ToInt32(p.Height * 0.9);
             if (p.Height < _paddleBaseHeight / 4)
                 p.Height = _paddleBaseHeight / 2;
@@ -225,6 +246,7 @@ namespace KinectPong
         {
             InitializeComponent();
 
+            SizeChanged += (s, a) => SetDimensions();
             WindowState = FormWindowState.Normal;
             FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
@@ -234,6 +256,9 @@ namespace KinectPong
             _scorePlayer1 = 0;
             _scorePlayer2 = 0;
 
+            score1.RotationAngle = 90;
+            score2.RotationAngle = 270;
+
             ball.Enabled = false;
             paddle.Enabled = false;
             pause_txt.Visible = false;
@@ -242,19 +267,11 @@ namespace KinectPong
             _lastYPlayer1 = MousePosition.Y;
             _lastYPlayer2 = paddle2.Location.Y;
 
-            SetDimensions();
-
-            SizeChanged += (s, a) => SetDimensions();
-
-            //Double Buffer (without this technique the screen will flash)
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
 
             _kinectHelper = new KinectHelper();
             _kinectHelper.PositionDetermined += KinectHelper_PositionDetermined;
             _kinectHelper.Start();
-
-            score1.RotationAngle = 90;
-            score2.RotationAngle = 270;
         }
 
         protected override void OnClosing(CancelEventArgs e)

@@ -5,6 +5,8 @@ namespace KinectPong
 {
     static class Program
     {
+        public static bool IsTwoPlayerMode = false;
+
         [STAThread]
         static void Main()
         {
