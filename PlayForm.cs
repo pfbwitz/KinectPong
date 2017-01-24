@@ -35,6 +35,12 @@ namespace KinectPong
 
         #region handlers
 
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            _kinectHelper.Dispose();
+        }
+
         private void KinectHelper_PositionDetermined(object sender, PaddlePositionEventArgs e)
         {
             if (e.PlayerNumber == 1)
@@ -86,26 +92,26 @@ namespace KinectPong
         {
             ball.Location = new Point(ball.Location.X + _xSpeed, ball.Location.Y + _ySpeed);
            
-            if (ball.Location.Y <= _topBounds)  //Ball Control:  Top Wall
+            if (ball.Location.Y <= _topBounds)
             {
                 _ySpeed *= -1;
                 while (ball.Location.Y - 1 < _topBounds)
                     ball.Location = new Point(ball.Location.X, ball.Location.Y + 1);
             }
-            else if (ball.Location.Y + ball.Height > _bottomBounds)   //Ball Control:  Bottom Wall
+            else if (ball.Location.Y + ball.Height > _bottomBounds)
             {
                 _ySpeed *= -1;
                 while (ball.Location.Y + 1 + ball.Height > _bottomBounds)
                     ball.Location = new Point(ball.Location.X, ball.Location.Y - 1);
             }
 
-            if (ball.Location.X > _rightBounds) //Ball Control: Player Scoring
+            if (ball.Location.X > _rightBounds)
             {
                 _scorePlayer1++;
                 score1.Text = _scorePlayer1.ToString();
                 InsertBall();
             }
-            else if (ball.Location.X < _leftBounds) //Ball Control - Player 2 Scoring
+            else if (ball.Location.X < _leftBounds)
             {
                 _scorePlayer2++;
                 score2.Text = _scorePlayer2.ToString();
@@ -272,12 +278,6 @@ namespace KinectPong
             _kinectHelper = new KinectHelper();
             _kinectHelper.PositionDetermined += KinectHelper_PositionDetermined;
             _kinectHelper.Start();
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            base.OnClosing(e);
-            _kinectHelper.Dispose();
         }
     }
 }
